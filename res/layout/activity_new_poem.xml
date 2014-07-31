@@ -1,0 +1,126 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:scrollbars="vertical"
+    tools:context="com.gqq.tangpoem.NewPoemActivity" >
+
+    <EditText
+        android:id="@+id/edtContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical" />
+
+    <LinearLayout
+        android:id="@+id/layoutCipai"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/edtContent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="词牌：" />
+
+        <EditText
+            android:id="@+id/edtCipai"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/layoutCipai"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="题目：" />
+
+        <EditText
+            android:id="@+id/edtTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutAuthor"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/layoutTitle"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="作者：" />
+
+        <EditText
+            android:id="@+id/edtAuthor"
+            android:layout_width="wrap_content"
+            android:width="100dp"
+            android:layout_height="wrap_content" >
+        </EditText>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="类型：" />
+
+        <RadioGroup
+            android:id="@+id/rdopType"
+            android:layout_width="fill_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content" >
+            <RadioButton
+                android:id="@+id/rdoTangshi"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="唐诗" />
+            <RadioButton
+                android:id="@+id/rdoSongci"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="宋词" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/layoutAuthor"
+        android:gravity="bottom"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确定" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="取消" />
+    </LinearLayout>
+
+</RelativeLayout>
