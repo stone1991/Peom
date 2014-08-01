@@ -9,12 +9,16 @@
         android:title="@string/action_settings"/>
     <item
         android:id="@+id/action_add"
-        android:orderInCategory="100"
         android:showAsAction="never"
         android:title="添加"/>
     <item
         android:id="@+id/action_del"
         android:showAsAction="never"
         android:title="删除"/>
+    
+      <item
+        android:id="@+id/action_list"
+        android:showAsAction="never"
+        android:title="目录"/>
 
 </menu>

@@ -40,6 +40,10 @@
             android:name=".NewPoemActivity"
             android:label="@string/title_activity_new_poem" >
         </activity>
+        <activity
+            android:name=".ListPoemActivity"
+            android:label="@string/title_activity_list_fruit">
+        </activity>
     </application>
 
 </manifest>

@@ -1,7 +1,5 @@
 package com.gqq.tangpoem;
 
-import java.util.*;
-
 import android.annotation.*;
 import android.app.*;
 import android.content.*;
@@ -20,14 +18,16 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 	private static final String TAG_PRESS = "TAG_PRESS";
 	public static final String DATABASE_TAG = "DataBase";
+	public static final String FILE_TAG = "File";
 	public static final String RETURN_TAG = "RETURN";
 	private static final String SYSTEM = "system";
 	private static final int FLING_MIN_DISTANCE = 100;
 	private static final int FLING_MIN_VELOCITY = 200;
+	public static final int LIST_POEM_ACTIVITY = 3;
 
-	private enum FlingDirection {
-		Left, None, Right
-	};
+	// private enum FlingDirection {
+	// Left, None, Right
+	// };
 
 	String str1;
 	String str2;
@@ -39,8 +39,12 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	float up_y = 0;
 	private GestureDetector detector;
 
-	private ArrayList<Poem> poems;
-	private int pointer;
+	// private ArrayList<Poem> poems;
+	// private int pointer;
+	// private int maxId;
+	// private int minId;
+	private int cId;
+	private Poem cPoem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,29 +57,8 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 	}
 
-	private boolean getPoems() {
-
-		poems.clear();
-		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-		try {
-			List<Poem> listpoems = poemdb.getAllPoems();
-
-			for (Poem poem : listpoems) {
-				poems.add(poem);
-			}
-
-			poemdb.closeDB();
-			return true;
-		} catch (Exception e) {
-			poemdb.closeDB();
-			Log.d(DATABASE_TAG, e.getMessage());
-			return false;
-		}
-	}
-
 	private void init() {
-		poems = new ArrayList<Poem>();
-		pointer = 0;
+		// poems = new ArrayList<Poem>();
 
 		tvContent = (TextView) findViewById(R.id.tvContent);
 		tvTitle = (TextView) findViewById(R.id.tvTitle);
@@ -95,18 +78,46 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 		tvContent.setOnTouchListener(this);
 
-		getPoems();
+		// getPoem();
+		//
+		// displayPoem();
+		cId = getCurrentId();
 
-		displayPoems();
+		dispCurrPoem();
 	}
 
-	/**
-	 * 显示所有诗词
-	 */
-	private void displayPoems() {
+	private int getCurrentId() {
+		SharedPreferences appPrefs = getSharedPreferences("infos", MODE_PRIVATE);
+		String strId = appPrefs.getString("currentId", "");
 
-		changeText(FlingDirection.None);
+		Log.d(FILE_TAG, "currentId:" + strId);
+
+		if ("".equals(strId))
+			return 1;
+		return Integer.parseInt(strId);
 	}
+
+	// private void getPoem() {
+	//
+	// // poems.clear();
+	// DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+	// poemdb.getPoem(cId);
+	// // try {
+	// // List<Poem> listpoems = poemdb.getAllPoems();
+	// //
+	// // for (Poem poem : listpoems) {
+	// // poems.add(poem);
+	// // }
+	// //
+	// // return true;
+	// // } catch (Exception e) {
+	// // poemdb.closeDB();
+	// // Log.d(DATABASE_TAG, e.getMessage());
+	// // return false;
+	// // }
+	// }
+
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -140,13 +151,19 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-							if (poemdb.delPoem(poems.get(pointer).getId())) {
-								poems.remove(pointer);
-								changeText(FlingDirection.None);
+							if (poemdb.delPoem(cId)) {
+								// poems.remove(pointer);
+								// changeText(FlingDirection.None);
+								dispNextPoem();
 							}
 						}
 
 					}).setNegativeButton("No", null).show();
+		} else if (R.id.action_list == id) {
+			Intent i = new Intent(this, ListPoemActivity.class);
+			// startActivity(i);
+			startActivityForResult(i, LIST_POEM_ACTIVITY);
+			return false;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -183,19 +200,35 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	public boolean onSingleTapUp(MotionEvent e) {
 		Log.d(TAG_PRESS, "onSingleTapUp");
 
-		int left = w_screen / 3;
-		int right = w_screen * 2 / 3;
-		float x = e.getX();
+		int left = w_screen / 4;
+		int right = w_screen * 3 / 4;
 
-		if (left > x) {
-			changeText(FlingDirection.Left);
+		int top = h_screen / 5;
+		int foot = h_screen * 4 / 5;
+		float x = e.getX();
+		boolean isValid = (e.getY() > top && e.getY() < foot) ? true : false;
+		if (left > x && isValid) {
+			// changeText(FlingDirection.Left);
+			dispPrePoem();
 		}
 
-		if (right < x) {
-			changeText(FlingDirection.Right);
+		if (right < x && isValid) {
+			// changeText(FlingDirection.Right);
+			dispNextPoem();
 		}
 
 		return false;
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		SharedPreferences appPrefs = getSharedPreferences("infos", MODE_PRIVATE);
+		SharedPreferences.Editor prefsEditor = appPrefs.edit();
+		prefsEditor.clear();
+		prefsEditor.putString("currentId", cId + "");
+		prefsEditor.commit();
+		Log.d(FILE_TAG, "currentId:" + cId + "");
 	}
 
 	/**
@@ -203,8 +236,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	 */
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-		Log.d(TAG_PRESS, "onScroll");
-
+		// Log.d(TAG_PRESS, "onScroll");
 		return false;
 	}
 
@@ -235,10 +267,12 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 		if (velocityX < 0) {
 			// 左滑动
-			changeText(FlingDirection.Left);
+			// changeText(FlingDirection.Left);
+			dispNextPoem();
 		} else if (velocityX > 0) {
 			// 右滑动
-			changeText(FlingDirection.Right);
+			// changeText(FlingDirection.Right);
+			dispPrePoem();
 		}
 		return false;
 	}
@@ -253,39 +287,100 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		// return false;
 		// OnGestureListener will analyzes the given motion event
 		// 这里的mGestureDetector是该Activity的一个属性.在构造方法中实例化或在oncreate()方法中实例化.
-		Log.d(TAG_PRESS, "on touch");
+//		Log.d(TAG_PRESS, "on touch");
 		return detector.onTouchEvent(event);
 	}
 
-	private void changeText(FlingDirection direct) {
-		// 设置到顶点
-		tvContent.setScrollY(0);
-		int size = poems.size();
+	private void dispCurrPoem(int id) {
+		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+		Log.d(DATABASE_TAG, "dispCurrPoem cid is:" + cId);
+		cPoem = poemdb.getPoem(id);
+		poemdb.closeDB();
+		displayPoem();
+	}
 
-		if (direct == FlingDirection.Right) {
-			pointer = (pointer + size + 1) % size;
-		} else if (direct == FlingDirection.Left) {
-			pointer = (pointer + size - 1) % size;
-		} else {
-			pointer = pointer % size;
+	private void dispCurrPoem() {
+		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+		Log.d(DATABASE_TAG, "dispCurrPoem cid is:" + cId);
+		cPoem = poemdb.getPoem(cId);
+		poemdb.closeDB();
+		displayPoem();
+	}
+
+	private void dispNextPoem() {
+		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+		Log.d(DATABASE_TAG, "dispNextPoem cid is:" + cId);
+
+		cPoem = poemdb.getNextPoem(cId);
+		poemdb.closeDB();
+		displayPoem();
+	}
+
+	private void dispPrePoem() {
+
+		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+		Log.d(DATABASE_TAG, "dispPrePoem cid is:" + cId);
+		cPoem = poemdb.getPrePoem(cId);
+		poemdb.closeDB();
+		displayPoem();
+	}
+
+	/**
+	 * 显示所有诗词
+	 */
+	private void displayPoem() {
+		Poem p = cPoem;
+		if (null == p) {
+			Log.d(DATABASE_TAG, "取得的诗词为null，请检查代码");
+			return;
 		}
-
-		Poem p = poems.get(pointer);
-
+		tvContent.setScrollY(0);
 		String title = p.getType().equals(PoemType.Shi) ? p.getTitle() : p.getCipai();
+		cId = p.getId();
+		Log.d(DATABASE_TAG, "cid is:" + cId);
 		tvTitle.setText(title + "·" + p.getAuthor());
 		tvContent.setText(p.getContent());
 	}
+	// private void changeText(FlingDirection direct) {
+	// // 设置到顶点
+	// tvContent.setScrollY(0);
+	// // int size = poems.size();
+	//
+	// if (direct == FlingDirection.Right) {
+	// DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+	// cPoem = poemdb.getNextPoem(cId);
+	// displayPoem();
+	// // pointer = (pointer + size + 1) % size;
+	// } else if (direct == FlingDirection.Left) {
+	// // pointer = (pointer + size - 1) % size;
+	// DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+	// cPoem = poemdb.getPrePoem(cId);
+	// displayPoem();
+	// } else {
+	// // pointer = pointer % size;
+	// }
+	//
+	// // Poem p = poems.get(pointer);
+	// //
+	// // String title = p.getType().equals(PoemType.Shi) ? p.getTitle() :
+	// // p.getCipai();
+	// // tvTitle.setText(title + "·" + p.getAuthor());
+	// // tvContent.setText(p.getContent());
+	// }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		// Log.d(RETURN_TAG, requestCode + "");
+		T.showShort(this, resultCode + "");
 		if (2 == resultCode) {
 			// 重新读取数据
-			getPoems();
-			displayPoems();
+			dispCurrPoem();
 			T.showShort(this, "重新加载完成！");
+		} else if (LIST_POEM_ACTIVITY == resultCode) {
+			T.showShort(this, "重新加载诗词！");
+
+			dispCurrPoem(data.getIntExtra("selectedPoemId", 1));
 		}
 	}
 
