@@ -24,6 +24,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	private static final int FLING_MIN_DISTANCE = 100;
 	private static final int FLING_MIN_VELOCITY = 200;
 	public static final int LIST_POEM_ACTIVITY = 3;
+	public static final int POEM_MODIFY = 4;
 
 	// private enum FlingDirection {
 	// Left, None, Right
@@ -116,6 +117,15 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
+		} else if (R.id.action_mod == id) {
+			// POEM_MODIFY
+			Intent i = new Intent(this, NewPoemActivity.class);
+			i.putExtra("ismodify", true);
+			i.putExtra("currentId", cId);
+			// startActivity(i);
+			startActivityForResult(i, POEM_MODIFY);
+			return false;
+
 		} else if (R.id.action_add == id) {
 			Intent i = new Intent(this, NewPoemActivity.class);
 			// startActivity(i);
@@ -324,13 +334,15 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		// Log.d(RETURN_TAG, requestCode + "");
+		Log.d(RETURN_TAG, requestCode + "");
 		if (2 == resultCode) {
 			// 重新读取数据
 			dispCurrPoem();
 			T.showShort(this, "重新加载完成！");
 		} else if (LIST_POEM_ACTIVITY == resultCode) {
 			dispCurrPoem(data.getIntExtra("selectedPoemId", 1));
+		} else if (POEM_MODIFY == resultCode) {
+			dispCurrPoem();
 		}
 	}
 

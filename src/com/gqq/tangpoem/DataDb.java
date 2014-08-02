@@ -222,6 +222,43 @@ public class DataDb {
 	}
 
 	/**
+	 * 修改一首诗词
+	 * 
+	 * @param type
+	 *            类型：0：诗，1：词
+	 * @param author
+	 *            作者
+	 * @param title
+	 *            题目
+	 * @param cipai
+	 *            词牌名
+	 * @param content
+	 *            诗词内容
+	 * @return 是否插入成功
+	 */
+	public boolean updatePoem(int id, int type, String author, String title,
+			String cipai, String content) {
+		String sql = "update " + DATA_TABLE_NAME + " set `type`=" + type
+				+ ", author='" + author;
+		sql += "', title='" + title;
+		sql += "', cipai='" + cipai;
+		sql += "', content='" + content;
+		sql += "' where id=" + id;
+
+		Log.d("Sql", sql);
+		try {
+			db.execSQL(sql);
+			db.close();
+			return true;
+		} catch (Exception e) {
+			db.close();
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	/**
 	 * 删除一首诗词
 	 * 
 	 * @param id

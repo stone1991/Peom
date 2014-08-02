@@ -15,8 +15,11 @@
         android:id="@+id/action_del"
         android:showAsAction="never"
         android:title="删除"/>
-    
-      <item
+    <item
+        android:id="@+id/action_mod"
+        android:showAsAction="never"
+        android:title="修改"/>
+    <item
         android:id="@+id/action_list"
         android:showAsAction="never"
         android:title="目录"/>

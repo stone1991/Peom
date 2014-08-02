@@ -19,11 +19,19 @@ public class NewPoemActivity extends Activity implements OnClickListener {
 	EditText edtTitle;
 	EditText edtAuthor;
 
+	private int type;
+	private String title, author, cipai, content;
+	private boolean ismod;
+	private int cid;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);//
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		// http://blog.csdn.net/stonesharp/article/details/7648384
+		// 解决盖住了输入法的问题
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 		setContentView(R.layout.activity_new_poem);
 		btnSubmit = (Button) findViewById(R.id.btnSubmit);
 		btnCancel = (Button) findViewById(R.id.btnCancel);
@@ -35,6 +43,30 @@ public class NewPoemActivity extends Activity implements OnClickListener {
 		btnCancel.setOnClickListener(this);
 		rdoTangshi = (RadioButton) findViewById(R.id.rdoTangshi);
 		rdoSongci = (RadioButton) findViewById(R.id.rdoSongci);
+		initPoem();
+	}
+
+	private void initPoem() {
+		Intent intent = getIntent();
+		ismod = intent.getBooleanExtra("ismodify", false);
+		Log.d("Intent ismodify", ismod + "");
+		if (!ismod)
+			return;
+		cid = intent.getIntExtra("currentId", 0);
+		if (0 == cid)
+			return;
+		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
+		Poem poem = poemdb.getPoem(cid);
+
+		edtContent.setText(poem.getContent());
+		edtTitle.setText(poem.getTitle());
+		edtCipai.setText(poem.getCipai());
+		edtAuthor.setText(poem.getAuthor());
+		if (poem.getType() == PoemType.Shi) {
+			rdoTangshi.setChecked(true);
+		} else {
+			rdoSongci.setChecked(true);
+		}
 	}
 
 	@Override
@@ -59,54 +91,77 @@ public class NewPoemActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.btnSubmit) {
-			int type = rdoTangshi.isChecked() ? 0 : 1;
-			T.showShort(this, type + "");
-			Log.d("test", type + "");
-			String content = (String) edtContent.getText().toString();
-			if ("".equals(content)) {
-				T.showShort(this, "内容不能为空");
-				return;
-			}
 
-			String title = (String) edtTitle.getText().toString();
-			if ("".equals(title)) {
-				T.showShort(this, "标题不能为空");
+			if (!doCheck())
 				return;
-			}
-
-			String author = (String) edtAuthor.getText().toString();
-			if ("".equals(author)) {
-				T.showShort(this, "作者不能为空");
-				return;
-			}
-
-			String cipai = (String) edtCipai.getText().toString();
-			if (type == 1 && "".equals(cipai)) {
-				T.showShort(this, "词牌不能为空");
-				return;
-			}
 
 			DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-			if (poemdb.insertPoem(type, author, title, cipai, content)) {
-				String msg = 0 == type ? "插入新诗成功" : "插入新词成功";
-				T.showLong(this, msg);
+			if (!ismod) {
+				// 如果是添加诗词
+				if (poemdb.insertPoem(type, author, title, cipai, content)) {
+					String msg = 0 == type ? "插入新诗成功" : "插入新词成功";
+					T.showLong(this, msg);
 
-				Intent intent = new Intent();
-				// 通过Intent对象返回结果，调用setResult方法
-				setResult(2, intent);
+					Intent intent = new Intent();
+					// 通过Intent对象返回结果，调用setResult方法
+					setResult(2, intent);
 
-				NewPoemActivity.this.finish();
+					NewPoemActivity.this.finish();
+				}
+			} else {
+				// 如果是修改诗词
+				if (poemdb.updatePoem(cid, type, author, title, cipai, content)) {
+					String msg = 0 == type ? "更新新诗成功" : "更新新词成功";
+					T.showLong(this, msg);
+
+					Intent intent = new Intent();
+					// 通过Intent对象返回结果，调用setResult方法
+					setResult(MainActivity.POEM_MODIFY, intent);
+
+					NewPoemActivity.this.finish();
+				}
 			}
 		} else if (v.getId() == R.id.btnCancel) {
-			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert)
+			new AlertDialog.Builder(this)
+					.setIcon(android.R.drawable.ic_dialog_alert)
 					.setMessage("确定不要插入吗？")
-					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							NewPoemActivity.this.finish();
-						}
+					.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									NewPoemActivity.this.finish();
+								}
 
-					}).setNegativeButton("No", null).show();
+							}).setNegativeButton("No", null).show();
 		}
+	}
+
+	private boolean doCheck() {
+		type = rdoTangshi.isChecked() ? 0 : 1;
+		content = (String) edtContent.getText().toString();
+		if ("".equals(content)) {
+			T.showShort(this, "内容不能为空");
+			return false;
+		}
+
+		title = (String) edtTitle.getText().toString();
+		if ("".equals(title)) {
+			T.showShort(this, "标题不能为空");
+			return false;
+		}
+
+		author = (String) edtAuthor.getText().toString();
+		if ("".equals(author)) {
+			T.showShort(this, "作者不能为空");
+			return false;
+		}
+
+		cipai = (String) edtCipai.getText().toString();
+		if (type == 1 && "".equals(cipai)) {
+			T.showShort(this, "词牌不能为空");
+			return false;
+		}
+		return true;
 	}
 }

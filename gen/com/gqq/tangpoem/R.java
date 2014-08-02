@@ -29,7 +29,8 @@ public final class R {
     public static final class id {
         public static final int action_add=0x7f080013;
         public static final int action_del=0x7f080014;
-        public static final int action_list=0x7f080015;
+        public static final int action_list=0x7f080016;
+        public static final int action_mod=0x7f080015;
         public static final int action_settings=0x7f080012;
         public static final int btnCancel=0x7f08000e;
         public static final int btnSubmit=0x7f08000d;
