@@ -97,28 +97,6 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		return Integer.parseInt(strId);
 	}
 
-	// private void getPoem() {
-	//
-	// // poems.clear();
-	// DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-	// poemdb.getPoem(cId);
-	// // try {
-	// // List<Poem> listpoems = poemdb.getAllPoems();
-	// //
-	// // for (Poem poem : listpoems) {
-	// // poems.add(poem);
-	// // }
-	// //
-	// // return true;
-	// // } catch (Exception e) {
-	// // poemdb.closeDB();
-	// // Log.d(DATABASE_TAG, e.getMessage());
-	// // return false;
-	// // }
-	// }
-
-
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -146,7 +124,8 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		} else if (R.id.action_del == id) {
 
 			new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert)
-					.setTitle("删除诗词").setMessage("确定要删除这首诗吗？")
+					.setTitle("删除诗词")
+					.setMessage("确定要删除这首诗吗？")
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -341,45 +320,16 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		tvTitle.setText(title + "·" + p.getAuthor());
 		tvContent.setText(p.getContent());
 	}
-	// private void changeText(FlingDirection direct) {
-	// // 设置到顶点
-	// tvContent.setScrollY(0);
-	// // int size = poems.size();
-	//
-	// if (direct == FlingDirection.Right) {
-	// DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-	// cPoem = poemdb.getNextPoem(cId);
-	// displayPoem();
-	// // pointer = (pointer + size + 1) % size;
-	// } else if (direct == FlingDirection.Left) {
-	// // pointer = (pointer + size - 1) % size;
-	// DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-	// cPoem = poemdb.getPrePoem(cId);
-	// displayPoem();
-	// } else {
-	// // pointer = pointer % size;
-	// }
-	//
-	// // Poem p = poems.get(pointer);
-	// //
-	// // String title = p.getType().equals(PoemType.Shi) ? p.getTitle() :
-	// // p.getCipai();
-	// // tvTitle.setText(title + "·" + p.getAuthor());
-	// // tvContent.setText(p.getContent());
-	// }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		// Log.d(RETURN_TAG, requestCode + "");
-		T.showShort(this, resultCode + "");
 		if (2 == resultCode) {
 			// 重新读取数据
 			dispCurrPoem();
 			T.showShort(this, "重新加载完成！");
 		} else if (LIST_POEM_ACTIVITY == resultCode) {
-			T.showShort(this, "重新加载诗词！");
-
 			dispCurrPoem(data.getIntExtra("selectedPoemId", 1));
 		}
 	}
