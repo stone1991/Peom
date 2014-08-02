@@ -1,5 +1,6 @@
 package com.gqq.tangpoem;
 
+import java.security.PublicKey;
 import java.util.*;
 
 import android.content.*;
@@ -25,11 +26,12 @@ public class DataDb {
 
 	public void openDB() {
 		if (null != db)
-			SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.CREATE_IF_NECESSARY);
+			SQLiteDatabase.openDatabase(path, null,
+					SQLiteDatabase.CREATE_IF_NECESSARY);
 	}
 
 	public int[] getMaxMinId() {
-		String sql = "select max(id) as max, min(id) as min from tangsong";
+		String sql = "select max(id) as max, min(id) as min from tangsong where `status`=1;";
 		int[] ids = { 0, 0 };
 		Cursor c = db.rawQuery(sql, null);
 		if (c.moveToNext()) {
@@ -50,7 +52,10 @@ public class DataDb {
 		}
 
 		try {
-			Cursor c = db.rawQuery("SELECT * from " + DATA_TABLE_NAME + " where id=" + id, null);
+			String sql = "SELECT * from " + DATA_TABLE_NAME
+					+ " where `status`=1 and id=" + id;
+			Log.d(MainActivity.DATABASE_TAG, sql);
+			Cursor c = db.rawQuery(sql, null);
 			return genPoem(c);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -66,8 +71,11 @@ public class DataDb {
 			return getPoem(ids[1]);
 
 		try {
-			Cursor c = db.rawQuery("SELECT * from " + DATA_TABLE_NAME + " where id>" + id
-					+ " order by id limit 1;", null);
+			String sql = "SELECT * from " + DATA_TABLE_NAME
+					+ " where `status`=1 and id>" + id
+					+ " order by id limit 1;";
+			Log.d(MainActivity.DATABASE_TAG, sql);
+			Cursor c = db.rawQuery(sql, null);
 			return genPoem(c);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,8 +90,13 @@ public class DataDb {
 			return getPoem(ids[0]);
 
 		try {
-			Cursor c = db.rawQuery("SELECT * from " + DATA_TABLE_NAME + " where id<" + id
-					+ " order by id desc limit 1;", null);
+
+			String sql = "SELECT * from " + DATA_TABLE_NAME
+					+ " where `status`=1 and id<" + id
+					+ " order by id desc limit 1;";
+			Log.d(MainActivity.DATABASE_TAG, sql);
+
+			Cursor c = db.rawQuery(sql, null);
 			return genPoem(c);
 
 		} catch (Exception e) {
@@ -91,8 +104,16 @@ public class DataDb {
 			db.close();
 			return null;
 		}
+
 	}
 
+	/**
+	 * 根据传入的游标生成一个Poem对象
+	 * 
+	 * @param c
+	 *            传入的游标
+	 * @return Poem对象
+	 */
 	private Poem genPoem(Cursor c) {
 		Poem shiCi = null;
 		if (c.moveToNext()) {
@@ -109,9 +130,46 @@ public class DataDb {
 		return shiCi;
 	}
 
+	/**
+	 * 取得所有的诗词
+	 * 
+	 * @return 诗词列表
+	 */
 	public List<Poem> getAllPoems() {
+
+		String sql = "SELECT * from " + DATA_TABLE_NAME
+				+ " where `status` = 1;";
+		return getPoemFromSql(sql);
+
+	}
+
+	/**
+	 * 取得所有的已经删除的诗词
+	 * 
+	 * @return 诗词列表
+	 */
+	public List<Poem> getAllDeletedPoems() {
+
+		String sql = "SELECT * from " + DATA_TABLE_NAME
+				+ " where `status` = 99;";
+		return getPoemFromSql(sql);
+	}
+
+	/**
+	 * 取得所有的熟悉的的诗词
+	 * 
+	 * @return 诗词列表
+	 */
+	public List<Poem> getAllFamiliarPoems() {
+
+		String sql = "SELECT * from " + DATA_TABLE_NAME
+				+ " where `status` = 0;";
+		return getPoemFromSql(sql);
+	}
+
+	private List<Poem> getPoemFromSql(String sql) {
 		List<Poem> list = new ArrayList<Poem>();
-		Cursor c = db.rawQuery("SELECT * from " + DATA_TABLE_NAME, null);
+		Cursor c = db.rawQuery(sql, null);
 		while (c.moveToNext()) {
 			int id = c.getInt(c.getColumnIndex("id"));
 			int type = c.getInt(c.getColumnIndex("type"));
@@ -131,15 +189,22 @@ public class DataDb {
 	 * 插入一首新诗
 	 * 
 	 * @param type
+	 *            类型：0：诗，1：词
 	 * @param author
+	 *            作者
 	 * @param title
+	 *            题目
 	 * @param cipai
+	 *            词牌名
 	 * @param content
-	 * @return
+	 *            诗词内容
+	 * @return 是否插入成功
 	 */
-	public boolean insertPoem(int type, String author, String title, String cipai, String content) {
+	public boolean insertPoem(int type, String author, String title,
+			String cipai, String content) {
 		String sql = "insert into " + DATA_TABLE_NAME
-				+ " (type, author,cipai,title, content) values (" + type + ", '" + author + "',";
+				+ " (`status`, type, author,cipai,title, content) values (1, "
+				+ type + ", '" + author + "',";
 		sql += "'" + cipai + "',";
 		sql += "'" + title + "',";
 		sql += "'" + content + "');";
@@ -156,9 +221,17 @@ public class DataDb {
 
 	}
 
+	/**
+	 * 删除一首诗词
+	 * 
+	 * @param id
+	 *            诗词id
+	 * @return
+	 */
 	public boolean delPoem(int id) {
-		String sql = "delete from " + DATA_TABLE_NAME + " where id = " + id;
-		Log.d("Sql", sql);
+		String sql = "update " + DATA_TABLE_NAME
+				+ " set `status` = 99 where id = " + id;
+		Log.d(MainActivity.DATABASE_TAG, sql);
 		try {
 			db.execSQL(sql);
 			db.close();

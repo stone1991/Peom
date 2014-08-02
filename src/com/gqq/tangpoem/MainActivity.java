@@ -159,7 +159,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	 */
 	@Override
 	public boolean onDown(MotionEvent e) {
-		Log.d(TAG_PRESS, "onDown");
+		// Log.d(TAG_PRESS, "onDown");
 		return false;
 	}
 
@@ -233,7 +233,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	 */
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-		Log.d(TAG_PRESS, "onFling");
+		// Log.d(TAG_PRESS, "onFling");
 
 		// e1：第1个ACTION_DOWN MotionEvent
 		// e2：最后一个ACTION_MOVE MotionEvent
@@ -272,7 +272,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 	private void dispCurrPoem(int id) {
 		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-		Log.d(DATABASE_TAG, "dispCurrPoem cid is:" + cId);
+		Log.d(DATABASE_TAG, "dispCurrPoem current poem id is:" + cId);
 		cPoem = poemdb.getPoem(id);
 		poemdb.closeDB();
 		displayPoem();
@@ -280,7 +280,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 	private void dispCurrPoem() {
 		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-		Log.d(DATABASE_TAG, "dispCurrPoem cid is:" + cId);
+		Log.d(DATABASE_TAG, "dispCurrPoem current poem id is:" + cId);
 		cPoem = poemdb.getPoem(cId);
 		poemdb.closeDB();
 		displayPoem();
@@ -288,7 +288,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 	private void dispNextPoem() {
 		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-		Log.d(DATABASE_TAG, "dispNextPoem cid is:" + cId);
+		Log.d(DATABASE_TAG, "dispNextPoem current poem id is:" + cId);
 
 		cPoem = poemdb.getNextPoem(cId);
 		poemdb.closeDB();
@@ -298,7 +298,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	private void dispPrePoem() {
 
 		DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-		Log.d(DATABASE_TAG, "dispPrePoem cid is:" + cId);
+		Log.d(DATABASE_TAG, "dispPrePoem current poem id is:" + cId);
 		cPoem = poemdb.getPrePoem(cId);
 		poemdb.closeDB();
 		displayPoem();
@@ -316,7 +316,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		tvContent.setScrollY(0);
 		String title = p.getType().equals(PoemType.Shi) ? p.getTitle() : p.getCipai();
 		cId = p.getId();
-		Log.d(DATABASE_TAG, "cid is:" + cId);
+		Log.d(DATABASE_TAG, "the displayed current poem id is:" + cId);
 		tvTitle.setText(title + "·" + p.getAuthor());
 		tvContent.setText(p.getContent());
 	}
