@@ -60,6 +60,10 @@ public class MainActivity extends Activity implements OnGestureListener,
 				dispNextPoem();
 			}
 
+			if (x > left && x < right && isValid) {
+				showmenu();
+			}
+
 			return false;
 		}
 
@@ -135,7 +139,6 @@ public class MainActivity extends Activity implements OnGestureListener,
 	 * 初始化Menu菜单
 	 */
 	private void initmenu() {
-		// TODO Auto-generated method stub
 		menuView = View.inflate(this, R.layout.gridview_menu, null);
 		// 创建AlertDialog
 		menuDialog = new AlertDialog.Builder(this).create();
@@ -206,6 +209,13 @@ public class MainActivity extends Activity implements OnGestureListener,
 
 	@Override
 	public boolean onMenuOpened(int featureId, Menu menu) {
+
+		showmenu();
+		return false;
+		// 返回为true 则显示系统menu
+	}
+
+	private void showmenu() {
 		if (menuDialog == null) {
 			menuDialog = new AlertDialog.Builder(this).setView(menuView).show();
 		} else {
@@ -219,7 +229,7 @@ public class MainActivity extends Activity implements OnGestureListener,
 			lp.x -= 180;
 			dialogWindow.setAttributes(lp);
 		}
-		return false;// 返回为true 则显示系统menu
+		// return false;
 	}
 
 	private SimpleAdapter getMenuAdapter(String[] menuNameArray,
