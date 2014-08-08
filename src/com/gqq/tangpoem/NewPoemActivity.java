@@ -46,6 +46,9 @@ public class NewPoemActivity extends Activity implements OnClickListener {
 		initPoem();
 	}
 
+	/**
+	 * 初始化诗词
+	 */
 	private void initPoem() {
 		Intent intent = getIntent();
 		ismod = intent.getBooleanExtra("ismodify", false);

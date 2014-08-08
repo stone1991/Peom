@@ -1,7 +1,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="#272822" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,7 +18,8 @@
             android:id="@+id/edtContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical" />
+            android:scrollbars="vertical"
+            android:textColor="#CFBFAD" />
 
         <LinearLayout
             android:id="@+id/layoutCipai"
@@ -30,12 +32,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="词牌：" />
+                android:text="词牌："
+                android:textColor="#CFBFAD" />
 
             <EditText
                 android:id="@+id/edtCipai"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:textColor="#CFBFAD" >
             </EditText>
         </LinearLayout>
 
@@ -50,12 +54,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="题目：" />
+                android:text="题目："
+                android:textColor="#CFBFAD" />
 
             <EditText
                 android:id="@+id/edtTitle"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:textColor="#CFBFAD" >
             </EditText>
         </LinearLayout>
 
@@ -70,19 +76,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="作者：" />
+                android:text="作者："
+                android:textColor="#CFBFAD" />
 
             <EditText
                 android:id="@+id/edtAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#CFBFAD"
                 android:width="100dp" >
             </EditText>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="类型：" />
+                android:text="类型："
+                android:textColor="#CFBFAD" />
 
             <RadioGroup
                 android:id="@+id/rdopType"
@@ -95,13 +104,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="唐诗" />
+                    android:text="诗"
+                    android:textColor="#CFBFAD" />
 
                 <RadioButton
                     android:id="@+id/rdoSongci"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="宋词" />
+                    android:text="词"
+                    android:textColor="#CFBFAD" />
             </RadioGroup>
         </LinearLayout>
 
@@ -112,19 +123,21 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/layoutAuthor"
-            android:gravity="bottom"
+            android:gravity="center_horizontal"
             android:orientation="horizontal" >
 
             <Button
                 android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:text="确定" />
 
             <Button
                 android:id="@+id/btnCancel"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="30dp"
                 android:text="取消" />
         </LinearLayout>

@@ -12,10 +12,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class ListPoemActivity extends ListActivity {
 
-	static final String[] POEMS = new String[] { "Apple", "Avocado", "Banana", "Blueberry",
-			"Coconut", "Durian", "Guava", "Kiwifruit", "Jackfruit", "Mango", "Olive", "Pear",
-			"Sugar-apple" };
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,7 +50,7 @@ public class ListPoemActivity extends ListActivity {
 		Intent intent = new Intent();
 		// 通过Intent对象返回结果，调用setResult方法
 		intent.putExtra("selectedPoemId", poem.getId());
-		setResult(MainActivity.LIST_POEM_ACTIVITY, intent);
+		setResult(MainActivity.LIST_POEM_RESULT, intent);
 		ListPoemActivity.this.finish();
 	}
 }
