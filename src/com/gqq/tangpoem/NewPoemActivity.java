@@ -95,36 +95,64 @@ public class NewPoemActivity extends Activity implements OnClickListener {
 			if (!doCheck())
 				return;
 
-			DataDb poemdb = new DataDb(getBaseContext(), PoemApplication.POEMDB);
-			if (!ismod) {
-				// 如果是添加诗词
-				if (poemdb.insertPoem(type, author, title, cipai, content)) {
-					String msg = 0 == type ? "插入新诗成功" : "插入新词成功";
-					T.showLong(this, msg);
+			new AlertDialog.Builder(this)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setMessage("确定要保存当前修改吗？")
+					.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
 
-					Intent intent = new Intent();
-					// 通过Intent对象返回结果，调用setResult方法
-					setResult(2, intent);
+									DataDb poemdb = new DataDb(
+											getBaseContext(),
+											PoemApplication.POEMDB);
+									if (!ismod) {
+										// 如果是添加诗词
+										int resultCode = poemdb.insertPoem(
+												type, author, title, cipai,
+												content);
+										if (resultCode > 0) {
+											String msg = 0 == type ? "插入新诗成功"
+													: "插入新词成功";
+											T.showLong(NewPoemActivity.this,
+													msg);
 
-					NewPoemActivity.this.finish();
-				}
-			} else {
-				// 如果是修改诗词
-				if (poemdb.updatePoem(cid, type, author, title, cipai, content)) {
-					String msg = 0 == type ? "更新新诗成功" : "更新新词成功";
-					T.showLong(this, msg);
+											Intent intent = new Intent();
+											intent.putExtra("maxId", resultCode);
+											// 通过Intent对象返回结果，调用setResult方法
+											setResult(
+													MainActivity.INSERT_POEM_SUCCESS,
+													intent);
 
-					Intent intent = new Intent();
-					// 通过Intent对象返回结果，调用setResult方法
-					setResult(MainActivity.POEM_MODIFY, intent);
+											NewPoemActivity.this.finish();
+										}
+									} else {
 
-					NewPoemActivity.this.finish();
-				}
-			}
+										// 如果是修改诗词
+										if (poemdb.updatePoem(cid, type,
+												author, title, cipai, content)) {
+											String msg = 0 == type ? "更新新诗成功"
+													: "更新新词成功";
+											T.showLong(NewPoemActivity.this,
+													msg);
+
+											Intent intent = new Intent();
+											// 通过Intent对象返回结果，调用setResult方法
+											setResult(MainActivity.POEM_MODIFY,
+													intent);
+
+											NewPoemActivity.this.finish();
+										}
+									}
+								}
+
+							}).setNegativeButton("No", null).show();
+
 		} else if (v.getId() == R.id.btnCancel) {
 			new AlertDialog.Builder(this)
 					.setIcon(android.R.drawable.ic_dialog_alert)
-					.setMessage("确定不要插入吗？")
+					.setMessage("确定要放弃修改吗？")
 					.setPositiveButton("Yes",
 							new DialogInterface.OnClickListener() {
 								@Override

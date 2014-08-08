@@ -42,7 +42,11 @@
         </activity>
         <activity
             android:name=".ListPoemActivity"
-            android:label="@string/title_activity_list_fruit">
+            android:label="@string/title_activity_list_fruit" >
+        </activity>
+        <activity
+            android:name=".MsgActivity"
+            android:label="@string/title_activity_msg" >
         </activity>
     </application>
 

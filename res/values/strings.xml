@@ -6,5 +6,6 @@
     <string name="action_settings">设置</string>
     <string name="title_activity_new_poem">新诗词</string>
     <string name="title_activity_list_fruit">诗词列表</string>
+    <string name="title_activity_msg">注释</string>
 
 </resources>

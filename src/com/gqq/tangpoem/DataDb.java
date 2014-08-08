@@ -1,5 +1,6 @@
 package com.gqq.tangpoem;
 
+import java.lang.annotation.Retention;
 import java.security.PublicKey;
 import java.util.*;
 
@@ -124,7 +125,9 @@ public class DataDb {
 			String cipai = c.getString(c.getColumnIndex("cipai"));
 			String title = c.getString(c.getColumnIndex("title"));
 			String content = c.getString(c.getColumnIndex("content"));
-			shiCi = new Poem(newId, pType, author, cipai, title, content);
+			String comment = c.getString(c.getColumnIndex("comment"));
+			shiCi = new Poem(newId, pType, author, cipai, title, content,
+					comment);
 		}
 		db.close();
 		return shiCi;
@@ -178,7 +181,9 @@ public class DataDb {
 			String cipai = c.getString(c.getColumnIndex("cipai"));
 			String title = c.getString(c.getColumnIndex("title"));
 			String content = c.getString(c.getColumnIndex("content"));
-			Poem shiCi = new Poem(id, pType, author, cipai, title, content);
+			String comment = c.getString(c.getColumnIndex("comment"));
+			Poem shiCi = new Poem(id, pType, author, cipai, title, content,
+					comment);
 			list.add(shiCi);
 		}
 		db.close();
@@ -200,25 +205,28 @@ public class DataDb {
 	 *            诗词内容
 	 * @return 是否插入成功
 	 */
-	public boolean insertPoem(int type, String author, String title,
+	public int insertPoem(int type, String author, String title,
 			String cipai, String content) {
 		String sql = "insert into " + DATA_TABLE_NAME
-				+ " (`status`, type, author,cipai,title, content) values (1, "
+				+ " (`status`, type, author,cipai,title, comment, content) values (1, "
 				+ type + ", '" + author + "',";
 		sql += "'" + cipai + "',";
 		sql += "'" + title + "',";
+		sql += "'" + "暂时无注释！" + "',";
 		sql += "'" + content + "');";
 		Log.d("Sql", sql);
 		try {
 			db.execSQL(sql);
-			db.close();
-			return true;
 		} catch (Exception e) {
 			db.close();
 			e.printStackTrace();
-			return false;
+			return 0;
 		}
 
+		int[] ids = getMaxMinId();
+
+		db.close();
+		return ids[0];
 	}
 
 	/**
@@ -243,6 +251,32 @@ public class DataDb {
 		sql += "', title='" + title;
 		sql += "', cipai='" + cipai;
 		sql += "', content='" + content;
+		sql += "' where id=" + id;
+
+		Log.d("Sql", sql);
+		try {
+			db.execSQL(sql);
+			db.close();
+			return true;
+		} catch (Exception e) {
+			db.close();
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	/**
+	 * 更新诗词的评论
+	 * 
+	 * @param id
+	 *            id
+	 * @param cm
+	 *            评论
+	 * @return
+	 */
+	public boolean updatePoemComment(int id ,String cm) {
+		String sql = "update " + DATA_TABLE_NAME + " set `comment`='" + cm;
 		sql += "' where id=" + id;
 
 		Log.d("Sql", sql);

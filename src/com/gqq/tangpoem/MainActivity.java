@@ -7,16 +7,58 @@ import android.os.*;
 import android.text.method.*;
 import android.util.*;
 import android.view.*;
+import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnTouchListener;
 import android.widget.*;
 
 public class MainActivity extends Activity implements OnGestureListener, OnTouchListener {
 
+	class DoubuleTapClass implements OnDoubleTapListener {
+
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			Log.d(TAG_PRESS, "onSingleTapConfirmed");
+
+			int left = w_screen / 4;
+			int right = w_screen * 3 / 4;
+
+			int top = h_screen / 5;
+			int foot = h_screen * 4 / 5;
+			float x = e.getX();
+			boolean isValid = (e.getY() > top && e.getY() < foot) ? true
+					: false;
+			if (left > x && isValid) {
+				// changeText(FlingDirection.Left);
+				dispPrePoem();
+			}
+
+			if (right < x && isValid) {
+				// changeText(FlingDirection.Right);
+				dispNextPoem();
+			}
+
+			return false;
+		}
+
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			Log.d(TAG_PRESS, "onDoubleTap");
+			modifyPoem();
+			return false;
+		}
+
+		@Override
+		public boolean onDoubleTapEvent(MotionEvent e) {
+			return false;
+		}
+
+	}
+
 	private TextView tvContent;
 	private TextView tvTitle;
 
-	private static final String TAG_PRESS = "TAG_PRESS";
+	public static final String TAG_PRESS = "TAG_PRESS";
 	public static final String DATABASE_TAG = "DataBase";
 	public static final String FILE_TAG = "File";
 	public static final String RETURN_TAG = "RETURN";
@@ -24,7 +66,9 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	private static final int FLING_MIN_DISTANCE = 100;
 	private static final int FLING_MIN_VELOCITY = 200;
 	public static final int LIST_POEM_ACTIVITY = 3;
+	public static final int INSERT_POEM_SUCCESS = 2;
 	public static final int POEM_MODIFY = 4;
+	public static final int POEM_ADD_MSG = 5;
 
 	// private enum FlingDirection {
 	// Left, None, Right
@@ -69,6 +113,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 
 		// 注册一个GestureDetector
 		detector = new GestureDetector(this, this);
+		detector.setOnDoubleTapListener(new DoubuleTapClass());
 		// 获得屏幕的宽度和高度
 		DisplayMetrics dm = getResources().getDisplayMetrics();
 		w_screen = dm.widthPixels;
@@ -119,11 +164,7 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 			return true;
 		} else if (R.id.action_mod == id) {
 			// POEM_MODIFY
-			Intent i = new Intent(this, NewPoemActivity.class);
-			i.putExtra("ismodify", true);
-			i.putExtra("currentId", cId);
-			// startActivity(i);
-			startActivityForResult(i, POEM_MODIFY);
+			modifyPoem();
 			return false;
 
 		} else if (R.id.action_add == id) {
@@ -158,6 +199,25 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void modifyPoem() {
+		Intent i = new Intent(this, NewPoemActivity.class);
+		i.putExtra("ismodify", true);
+		i.putExtra("currentId", cId);
+		// startActivity(i);
+		startActivityForResult(i, POEM_MODIFY);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		SharedPreferences appPrefs = getSharedPreferences("infos", MODE_PRIVATE);
+		SharedPreferences.Editor prefsEditor = appPrefs.edit();
+		prefsEditor.clear();
+		prefsEditor.putString("currentId", cId + "");
+		prefsEditor.commit();
+		Log.d(FILE_TAG, "currentId:" + cId + "");
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// 将触屏事件交给手势识别类处理
@@ -189,36 +249,10 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	public boolean onSingleTapUp(MotionEvent e) {
 		Log.d(TAG_PRESS, "onSingleTapUp");
 
-		int left = w_screen / 4;
-		int right = w_screen * 3 / 4;
-
-		int top = h_screen / 5;
-		int foot = h_screen * 4 / 5;
-		float x = e.getX();
-		boolean isValid = (e.getY() > top && e.getY() < foot) ? true : false;
-		if (left > x && isValid) {
-			// changeText(FlingDirection.Left);
-			dispPrePoem();
-		}
-
-		if (right < x && isValid) {
-			// changeText(FlingDirection.Right);
-			dispNextPoem();
-		}
-
 		return false;
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		SharedPreferences appPrefs = getSharedPreferences("infos", MODE_PRIVATE);
-		SharedPreferences.Editor prefsEditor = appPrefs.edit();
-		prefsEditor.clear();
-		prefsEditor.putString("currentId", cId + "");
-		prefsEditor.commit();
-		Log.d(FILE_TAG, "currentId:" + cId + "");
-	}
+
 
 	/**
 	 * 用户按下触摸屏，并拖动，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE触发
@@ -235,8 +269,13 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	@Override
 	public void onLongPress(MotionEvent e) {
 		Log.d(TAG_PRESS, "onLongPress");
-
+		// POEM_MODIFY
+		Intent i = new Intent(this, MsgActivity.class);
+		i.putExtra("currentId", cId);
+		// startActivity(i);
+		startActivityForResult(i, POEM_ADD_MSG);
 	}
+
 
 	/**
 	 * 用户按下触摸屏、快速移动后松开，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE, 1个ACTION_UP触发
@@ -335,13 +374,13 @@ public class MainActivity extends Activity implements OnGestureListener, OnTouch
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		Log.d(RETURN_TAG, requestCode + "");
-		if (2 == resultCode) {
+		if (INSERT_POEM_SUCCESS == resultCode) {
 			// 重新读取数据
-			dispCurrPoem();
+			dispCurrPoem(data.getIntExtra("maxId", cId));
 			T.showShort(this, "重新加载完成！");
-		} else if (LIST_POEM_ACTIVITY == resultCode) {
+		} else if (LIST_POEM_ACTIVITY == requestCode) {
 			dispCurrPoem(data.getIntExtra("selectedPoemId", 1));
-		} else if (POEM_MODIFY == resultCode) {
+		} else if (POEM_MODIFY == requestCode) {
 			dispCurrPoem();
 		}
 	}

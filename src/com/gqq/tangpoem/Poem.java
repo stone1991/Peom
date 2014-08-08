@@ -1,18 +1,23 @@
 package com.gqq.tangpoem;
 
+import android.R.string;
+
 public class Poem {
 	private int id;
 	private String author;
 	private String cipai;
 	private String title;
+	private String comment;
 
-	public Poem(int id, PoemType type, String author, String cipai, String titile, String content) {
+	public Poem(int id, PoemType type, String author, String cipai,
+			String titile, String content, String comment) {
 		this.id = id;
 		this.type = type;
 		this.cipai = cipai;
 		this.title = titile;
 		this.author = author;
 		this.content = content;
+		this.setComment(comment);
 	}
 
 	public int getId() {
@@ -61,6 +66,14 @@ public class Poem {
 
 	public void setType(PoemType type) {
 		this.type = type;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	private String content;
